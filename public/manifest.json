@@ -1,0 +1,26 @@
+{
+  "name": "Space Mission Dashboard",
+  "short_name": "Mission Control",
+  "description": "Real-time space mission monitoring and satellite tracking dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0D0D",
+  "theme_color": "#8cbdf8",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["science", "education", "utilities"],
+  "screenshots": []
+}
