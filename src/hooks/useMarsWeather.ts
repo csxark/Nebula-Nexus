@@ -9,23 +9,21 @@ interface MarsWeather {
 }
 
 export function useMarsWeather() {
-  const [weather, setWeather] = useState<MarsWeather[]>([]);
+  const [weather, setWeather] = useState<MarsWeather | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://mars.nasa.gov/rss/api/?feed=weather&category=insight&feedtype=json")
+    fetch("https://api.maas2.apollorion.com/")
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.soles) {
-          const latest = data.soles.slice(0, 5).map((entry: any) => ({
-            terrestrial_date: entry.terrestrial_date,
-            min_temp: entry.min_temp,
-            max_temp: entry.max_temp,
-            pressure: entry.pressure,
-            season: entry.season,
-          }));
-          setWeather(latest);
-        }
+        const formatted: MarsWeather = {
+          terrestrial_date: data.terrestrial_date,
+          min_temp: data.min_temp,
+          max_temp: data.max_temp,
+          pressure: data.pressure,
+          season: data.season,
+        };
+        setWeather(formatted);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
