@@ -1,20 +1,18 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Satellite, Menu, X, Globe } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Satellite, Menu, X, Globe } from "lucide-react";
 
-// Components
-import StarField from './components/StarField';
-import Earth3D from './components/Earth3D';
-import ISSTracker from './components/ISSTracker';
-import MissionPanel from './components/MissionPanel';
-import TelemetryChart from './components/TelemetryChart';
-import Sidebar from './components/Sidebar'; 
+import StarField from "./components/StarField";
+import Earth3D from "./components/Earth3D";
+import ISSTracker from "./components/ISSTracker";
+import TelemetryChart from "./components/TelemetryChart";
+import Sidebar from "./components/Sidebar";
 
-// Hooks
-import { useISSPosition, useSpaceWeather, useMissions } from './hooks/useSpaceData';
+import MarsWeather from "./components/MarsWeather"; // [NEW]
+import { useMarsWeather } from "./hooks/useMarsWeather";      // [NEW]
 
+import { useISSPosition, useSpaceWeather, useMissions } from "./hooks/useSpaceData";
 
-function App() {
+export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -22,12 +20,14 @@ function App() {
   const spaceWeather = useSpaceWeather();
   const missions = useMissions();
 
+  const { weather: marsWeather, loading: marsLoading } = useMarsWeather(); // [NEW]
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const activeMissions = missions.filter((m) => m.status === 'active');
+  const activeMissions = missions.filter((m) => m.status === "active");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white overflow-x-hidden">
@@ -55,10 +55,11 @@ function App() {
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="text-sm text-green-400">All Systems Operational</span>
             </div>
-
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={() => setSidebarOpen((v) => !v)}
               className="lg:hidden p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+              aria-label="Toggle sidebar"
+              type="button"
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -76,11 +77,10 @@ function App() {
         />
 
         {/* Main Content */}
-        <main className="flex-1 p-4 lg:p-6 space-y-6">
-          {/* Top Row */}
+        <main className="flex-1 p-4 lg:p-6 space-y-6 transition-all duration-300">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2">
-              <div className="bg-gray-900/50 backdrop-blur border border-blue-500/30 rounded-lg p-4">
+              <div className="bg-gray-900/50 shadow-lg backdrop-blur border border-blue-500/30 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Globe className="w-5 h-5 text-blue-400" />
                   <h3 className="text-lg font-semibold">Earth Overview</h3>
@@ -91,15 +91,13 @@ function App() {
                   )}
                 </div>
                 <div className="h-96">
-                  <Earth3D issPosition={issPosition} />
+                  <Earth3D issPosition={issPosition ?? undefined} />
                 </div>
               </div>
             </div>
-
             <div className="space-y-6">
               <ISSTracker position={issPosition} loading={issLoading} />
-
-              <div className="bg-gray-900/50 backdrop-blur border border-green-500/30 rounded-lg p-4">
+              <div className="bg-gray-900/50 shadow-lg backdrop-blur border border-green-500/30 rounded-lg p-4">
                 <h3 className="text-lg font-semibold mb-4">Mission Summary</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
@@ -120,16 +118,16 @@ function App() {
                   </div>
                 </div>
               </div>
+              {/* --- MARS WEATHER PANEL --- */}
+              <MarsWeather /> {/* [NEW] */}
             </div>
           </div>
 
-          
           <div className="grid grid-cols-1 gap-6">
             <TelemetryChart />
           </div>
 
-        
-          <div className="bg-black/40 backdrop-blur border border-gray-700/50 rounded-lg p-4">
+          <div className="bg-black/40 shadow-md backdrop-blur border border-gray-700/50 rounded-lg p-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -151,16 +149,6 @@ function App() {
           </div>
         </main>
       </div>
-
-      
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
     </div>
   );
 }
-
-export default App;

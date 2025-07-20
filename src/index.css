@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-7deg); }
+    50% { transform: rotate(7deg);}
+  }
+  .animate-wiggle { animation: wiggle 2.8s ease-in-out infinite; }
+  @keyframes spin-slow { 100% { transform: rotate(360deg); } }
+  .animate-spin-slow { animation: spin-slow 9s linear infinite; }
+}
