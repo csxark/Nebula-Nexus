@@ -1,5 +1,5 @@
-import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { useRef, useMemo } from 'react';
+import { Canvas, useFrame, } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { ISSPosition } from '../types/space';
