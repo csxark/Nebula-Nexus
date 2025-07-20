@@ -1,39 +1,38 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Satellite, Menu, X, Settings, Globe } from 'lucide-react';
+import { Satellite, Menu, X, Globe } from 'lucide-react';
 
 // Components
 import StarField from './components/StarField';
 import Earth3D from './components/Earth3D';
 import ISSTracker from './components/ISSTracker';
 import MissionPanel from './components/MissionPanel';
-import SpaceWeatherPanel from './components/SpaceWeatherPanel';
-import APODPanel from './components/APODPanel';
 import TelemetryChart from './components/TelemetryChart';
+import Sidebar from './components/Sidebar'; 
 
 // Hooks
-import { useISSPosition, useSpaceWeather, useMissions, useAPOD } from './hooks/useSpaceData';
+import { useISSPosition, useSpaceWeather, useMissions } from './hooks/useSpaceData';
+
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  
+
   const { position: issPosition, loading: issLoading } = useISSPosition();
   const spaceWeather = useSpaceWeather();
   const missions = useMissions();
-  const { apod, loading: apodLoading } = useAPOD();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const activeMissions = missions.filter(m => m.status === 'active');
+  const activeMissions = missions.filter((m) => m.status === 'active');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white overflow-x-hidden">
       <StarField />
-      
+
       {/* Header */}
       <header className="relative z-50 bg-black/20 backdrop-blur border-b border-blue-500/30">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -50,13 +49,13 @@ function App() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="text-sm text-green-400">All Systems Operational</span>
             </div>
-            
+
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
@@ -69,35 +68,16 @@ function App() {
 
       <div className="flex relative">
         {/* Sidebar */}
-        <motion.aside
-          initial={false}
-          animate={{ 
-            x: sidebarOpen ? 0 : '-100%',
-            opacity: sidebarOpen ? 1 : 0 
-          }}
-          className="fixed lg:relative lg:translate-x-0 lg:opacity-100 z-40 w-80 h-screen bg-black/40 backdrop-blur border-r border-blue-500/30 p-4 space-y-4 overflow-y-auto"
-        >
-          {/* Mission Status */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-400" />
-              Active Missions
-            </h2>
-            {activeMissions.map(mission => (
-              <MissionPanel key={mission.id} mission={mission} />
-            ))}
-          </div>
-
-          {/* Space Weather */}
-          <SpaceWeatherPanel weather={spaceWeather} />
-
-          {/* APOD */}
-          <APODPanel apod={apod} loading={apodLoading} />
-        </motion.aside>
+        <Sidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          spaceWeather={spaceWeather}
+          activeMissions={activeMissions}
+        />
 
         {/* Main Content */}
         <main className="flex-1 p-4 lg:p-6 space-y-6">
-          {/* Top Row - 3D Earth and ISS Tracker */}
+          {/* Top Row */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2">
               <div className="bg-gray-900/50 backdrop-blur border border-blue-500/30 rounded-lg p-4">
@@ -115,11 +95,10 @@ function App() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-6">
               <ISSTracker position={issPosition} loading={issLoading} />
-              
-              {/* Quick Stats */}
+
               <div className="bg-gray-900/50 backdrop-blur border border-green-500/30 rounded-lg p-4">
                 <h3 className="text-lg font-semibold mb-4">Mission Summary</h3>
                 <div className="space-y-3">
@@ -144,12 +123,12 @@ function App() {
             </div>
           </div>
 
-          {/* Bottom Row - Telemetry Chart */}
+          
           <div className="grid grid-cols-1 gap-6">
             <TelemetryChart />
           </div>
 
-          {/* Footer Status Bar */}
+        
           <div className="bg-black/40 backdrop-blur border border-gray-700/50 rounded-lg p-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
@@ -173,9 +152,9 @@ function App() {
         </main>
       </div>
 
-      {/* Mobile Overlay */}
+      
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
